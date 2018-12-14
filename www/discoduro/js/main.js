@@ -26,6 +26,7 @@ function validate(){
 }
 
 function showResult(anserw){
+    console.log(anserw.srcElement.responseText);
     var user = JSON.parse(anserw.srcElement.responseText);    
     alert(user);
 }

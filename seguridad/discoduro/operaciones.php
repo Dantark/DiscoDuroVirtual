@@ -1,17 +1,22 @@
 <?php
 function connect(){
     include "discodurobd.php";
-    $canal=@mysqli_connect(IP,USUARIO,CLAVE,BD);
-    mysqli_set_charset($canal,"utf8");
-    if (!$comprobar){
-        echo "Ha ocurrido el error: ".mysqli_connect_errno()." ".mysqli_connect_error($comprobar)."<br />";
+    $connect=mysqli_connect(IP,USUARIO,CLAVE,BD);
+    mysqli_set_charset($connect,"utf8");
+
+    return $connect;
+}
+
+function validateConnect($connect){
+    if(!$connect){
+        echo "Ha ocurrido el error: ".mysqli_connect_errno()." ".mysqli_connect_error($connect)."<br />";
         exit;
-     }
-    return $canal;
+    }
 }
 
 function userValidate($user, $psw){
     $pswBD = getPsw($user, $psw);
+    return $pswBD;
     if($pswBD==false){
         return "error0";
     }
@@ -26,8 +31,9 @@ function userValidate($user, $psw){
 }
 
 function getPsw($user, $psw){
-    $getPswSelect = "select usuario,clave from usuarios where usuario=?";
+    $getPswSelect = "select clave from usuarios where usuario=?";
     $connect = connect();
+    validateConnect($connect);
     $getPswQuery = mysqli_prepare($connect, $getPswSelect);
     mysqli_stmt_bind_param($getPswQuery, "s", $userQuery);
     $userQuery = $user;
@@ -36,7 +42,14 @@ function getPsw($user, $psw){
     mysqli_stmt_bind_result($getPswQuery, $pswBD);
     mysqli_stmt_fetch($getPswQuery);
 
-    return $pswBD;
+    
+    if(is_null($pswBD)){
+        return 0;
+    }else if(!password_verify($psw, $pswBD)){
+        return 1;
+    }else if(password_verify($psw, $pswBD)){
+        return 2;
+    }
 }
 
 function createSession($user){
