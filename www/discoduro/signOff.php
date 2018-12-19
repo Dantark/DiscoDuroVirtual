@@ -1,0 +1,10 @@
+<?php
+    session_name("SESION");
+    session_cache_limiter('nocache');
+    session_start(); 
+
+    session_destroy();
+    unset($_SESSION);
+    header("Location: index.php");
+    exit;
+?>
